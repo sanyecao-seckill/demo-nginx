@@ -4,6 +4,7 @@ server {
         error_log logs/domain-error.log error;
         access_log logs/domain-access.log access;
         default_type text/plain;
+        charset utf-8;
 
         #security token
         set $st "";
@@ -55,21 +56,46 @@ server {
 
         #结算页页面初始化渲染所需数据
         location /settlement/initData{
-            proxy_pass http://backend;
             access_by_lua_block{
-               ngx.log(ngx.ERR,"initData st is :"..ngx.var.st)
+               local _st = ngx.md5(ngx.var.user_id.."2")
+               if _st ~= ngx.var.st then
+                 return ngx.exit(500)
+               end
+            }
+            proxy_pass http://backend;
+            header_filter_by_lua_block{
+               ngx.header["st"] = ngx.md5(ngx.var.user_id.."3")
+               ngx.header["Access-Control-Expose-Headers"] = "st"
             }
             error_page 500 502 503 504 @json_fail;
         }
 
         #结算页提交订单
         location /settlement/submitData{
+            access_by_lua_file /Users/wangzhangfei5/Documents/seckillproject/demo-nginx/lua/submit_access.lua;
             proxy_pass http://backend;
+            error_page 500 502 503 504 @json_fail;
         }
 
         #结算页用户行为操作。模糊匹配
         location ~* /useAction/{
             proxy_pass http://backend;
+        }
+
+        #静态资源匹配,模糊匹配
+        location ^~ /images/{
+            set_by_lua_block $user_id{
+            }
+            proxy_pass http://backend;
+        }
+
+        #模拟登录
+        location /login{
+            content_by_lua_block{
+              local user_id = ngx.var.arg_user_id
+              ngx.header['Set-Cookie'] = 'user_id='..user_id..';path=/; Expires=' .. ngx.cookie_time(ngx.time() + 60 * 60*24)
+              ngx.say("login success！！！")
+            }
         }
 
         #错误页
@@ -82,13 +108,6 @@ server {
         location @json_fail {
             default_type application/json;
             return 200 '{"code":"200001","message":"nginx intercept！！！"}';
-        }
-
-        #静态资源匹配,模糊匹配
-        location ^~ /images/{
-            set_by_lua_block $user_id{
-            }
-            proxy_pass http://backend;
         }
 
 }
