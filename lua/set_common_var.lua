@@ -17,7 +17,4 @@ if user_id == nil then
     user_id = ""
 end
 
---打印从cooker中获取的user_id
-ngx.log(ngx.ERR,"*******user id is : "..user_id)
-
 return user_id
