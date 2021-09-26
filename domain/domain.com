@@ -18,7 +18,7 @@ server {
         #活动数据查询
         location /activity/query{
             limit_req zone=limit_by_user nodelay;
-            proxy_pass http://backend;
+            content_by_lua_file /Users/wangzhangfei5/Documents/seckillproject/demo-nginx/lua/activity_query.lua;
             #设置返回的header，并将security token放在header中
             header_filter_by_lua_block{
                ngx.header["st"] = ngx.md5(ngx.var.user_id.."1")
@@ -82,7 +82,7 @@ server {
             proxy_pass http://backend;
         }
 
-        #静态资源匹配,模糊匹配
+        #静态资源匹配,模糊匹配，如果静态资源上到CDN，这里就可以不用了
         location ^~ /images/{
             set_by_lua_block $user_id{
             }
@@ -98,16 +98,6 @@ server {
             }
         }
 
-        #错误页
-        location = /html_fail.html {
-            default_type text/html;
-            root /Users/wangzhangfei5/Documents/seckillproject/demo-nginx/html;
-        }
-
-        #以"@"开头定义的location，是内部接口，外部无法访问
-        location @json_fail {
-            default_type application/json;
-            return 200 '{"code":"200001","message":"nginx intercept！！！"}';
-        }
+        include /Users/wangzhangfei5/Documents/seckillproject/demo-nginx/domain/public.com;
 
 }

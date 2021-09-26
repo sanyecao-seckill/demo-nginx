@@ -1,3 +1,5 @@
+-- 解析通用变量赋值功能
+
 --通过请求URL获取st，并赋值给变量st
 local param_st = ngx.var.arg_st
 if param_st == nil then

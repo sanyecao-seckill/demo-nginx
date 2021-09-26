@@ -1,3 +1,5 @@
+-- 黑名单缓存功能
+
 local _CACHE = {}
 -- 共享内存区域，用于统计黑名单以及保存黑名单
 local hole = ngx.shared.black_hole
