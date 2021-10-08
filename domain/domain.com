@@ -1,10 +1,16 @@
 server {
         listen 7081;
 
+        #设置真实的域名
+        #server_name  test.com;
+        #设置header中的host
+        #proxy_set_header Host test.com;
+
         error_log logs/domain-error.log error;
         access_log logs/domain-access.log access;
         default_type text/plain;
         charset utf-8;
+
 
         #security token
         set $st "";

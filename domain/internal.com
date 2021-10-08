@@ -14,6 +14,10 @@ server {
             content_by_lua_file /Users/wangzhangfei5/Documents/seckillproject/demo-nginx/lua/activity_pre_load.lua;
         }
 
+        #测试请求头
+        location /mock/testHeader{
+           proxy_pass http://backend;
+        }
 
 
         include /Users/wangzhangfei5/Documents/seckillproject/demo-nginx/domain/public.com;
