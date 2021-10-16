@@ -17,7 +17,7 @@ if not activity_info or activity_info == "" then
     ngx.log(ngx.ERR,"local activity is null!")
 
     -- 将请求通过upstream分发给后端Web服务
-    local res = ngx.location.capture("/activity/subQuery")
+    local res = ngx.location.capture("/activity/subQuery",{ args = { productId = product_id }})
     if not res or res.status ~=200 then
         ngx.say("")
         return

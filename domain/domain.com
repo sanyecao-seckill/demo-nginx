@@ -28,7 +28,10 @@ server {
             #设置返回的header，并将security token放在header中
             header_filter_by_lua_block{
                ngx.header["st"] = ngx.md5(ngx.var.user_id.."1")
+               --这里为了解决跨域问题设置的，不存在跨域时不需要设置以下header
                ngx.header["Access-Control-Expose-Headers"] = "st"
+               ngx.header["Access-Control-Allow-Origin"] = "http://localhost:8080"
+               ngx.header["Access-Control-Allow-Credentials"] = "true"
             }
         }
 
